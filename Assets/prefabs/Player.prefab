@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 65243791417194150}
   - component: {fileID: 23452197193692768}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: shades
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
