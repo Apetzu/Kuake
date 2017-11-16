@@ -10,6 +10,8 @@ public class playerController : NetworkBehaviour {
     public CursorLockMode cursorState = CursorLockMode.None;
     public float movAccel = 10;
     public float jumpAccel = 300;
+    public GameObject rocketPrefab;
+    Transform rocketSpawn;
     Rigidbody rb;
     int jump = 0;
 
@@ -19,6 +21,7 @@ public class playerController : NetworkBehaviour {
 		playerCamera = transform.Find("playerCamera").GetComponent<Camera>();
         Cursor.lockState = cursorState;
         rb = GetComponent<Rigidbody>();
+        rocketSpawn = transform.Find("rocketSpawn");
     }
 
     void FixedUpdate()
@@ -29,7 +32,12 @@ public class playerController : NetworkBehaviour {
             return;
         }
 
-		rb.AddRelativeForce (Vector3.Scale (new Vector3 (Input.GetAxisRaw ("Horizontal"), jump, Input.GetAxisRaw ("Vertical")).normalized, new Vector3 (movAccel * rb.mass, jumpAccel, movAccel * rb.mass)));
+        if (axis2Bool("Fire"))
+        {
+            Fire();
+        }
+
+        rb.AddRelativeForce (Vector3.Scale (new Vector3 (Input.GetAxisRaw ("Horizontal"), jump, Input.GetAxisRaw ("Vertical")).normalized, new Vector3 (movAccel * rb.mass, jumpAccel, movAccel * rb.mass)));
 
 		Vector2 mouseDelta = mouseMovement () * mouseSensitivity;
 
@@ -38,6 +46,21 @@ public class playerController : NetworkBehaviour {
 		playerCamera.transform.localRotation = Quaternion.Euler (strangeAxisClamp (-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x, 90, 270), 0, 0);
 
 		jump = 0;
+    }
+
+    void Fire()
+    {
+        // Create the Bullet from the Bullet Prefab
+        var rocket = (GameObject)Instantiate(
+            rocketPrefab,
+            rocketSpawn.position,
+            rocketSpawn.rotation);
+
+        // Add velocity to the bullet
+        rocket.GetComponent<Rigidbody>().velocity = rocket.transform.forward * 6;
+
+        // Destroy the bullet after 2 seconds
+        Destroy(rocket, 2.0f);
     }
 
     public float strangeAxisClamp(float value, float limit1, float limit2)
