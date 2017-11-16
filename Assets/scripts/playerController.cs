@@ -13,6 +13,7 @@ public class playerController : NetworkBehaviour {
     Rigidbody rb;
     int jump = 0;
 
+
     void Awake()
     {
 		playerCamera = transform.Find("playerCamera").GetComponent<Camera>();
@@ -22,18 +23,21 @@ public class playerController : NetworkBehaviour {
 
     void FixedUpdate()
     {
-		if (isLocalPlayer) 
-		{
-			rb.AddRelativeForce (Vector3.Scale (new Vector3 (Input.GetAxisRaw ("Horizontal"), jump, Input.GetAxisRaw ("Vertical")).normalized, new Vector3 (movAccel * rb.mass, jumpAccel, movAccel * rb.mass)));
+        if (!isLocalPlayer)
+        {
+            playerCamera.enabled = false;
+            return;
+        }
 
-			Vector2 mouseDelta = mouseMovement () * mouseSensitivity;
+		rb.AddRelativeForce (Vector3.Scale (new Vector3 (Input.GetAxisRaw ("Horizontal"), jump, Input.GetAxisRaw ("Vertical")).normalized, new Vector3 (movAccel * rb.mass, jumpAccel, movAccel * rb.mass)));
 
-			rb.MoveRotation (Quaternion.Euler (0, rb.rotation.eulerAngles.y + mouseDelta.x, 0));
-			//mainCamera.transform.Rotate(new Vector3(-mouseDelta.y, 0, 0)); This doesn't have clamping capability
-			playerCamera.transform.localRotation = Quaternion.Euler (strangeAxisClamp (-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x, 90, 270), 0, 0);
+		Vector2 mouseDelta = mouseMovement () * mouseSensitivity;
 
-			jump = 0;
-		}
+		rb.MoveRotation (Quaternion.Euler (0, rb.rotation.eulerAngles.y + mouseDelta.x, 0));
+		//mainCamera.transform.Rotate(new Vector3(-mouseDelta.y, 0, 0)); This doesn't have clamping capability
+		playerCamera.transform.localRotation = Quaternion.Euler (strangeAxisClamp (-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x, 90, 270), 0, 0);
+
+		jump = 0;
     }
 
     public float strangeAxisClamp(float value, float limit1, float limit2)
