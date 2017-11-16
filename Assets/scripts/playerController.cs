@@ -34,7 +34,7 @@ public class playerController : NetworkBehaviour {
 
         if (axis2Bool("Fire"))
         {
-            Fire();
+            CmdFire();
         }
 
         rb.AddRelativeForce (Vector3.Scale (new Vector3 (Input.GetAxisRaw ("Horizontal"), jump, Input.GetAxisRaw ("Vertical")).normalized, new Vector3 (movAccel * rb.mass, jumpAccel, movAccel * rb.mass)));
@@ -47,8 +47,8 @@ public class playerController : NetworkBehaviour {
 
 		jump = 0;
     }
-
-    void Fire()
+    [Command]
+    void CmdFire()
     {
         // Create the Bullet from the Bullet Prefab
         var rocket = (GameObject)Instantiate(
@@ -59,8 +59,12 @@ public class playerController : NetworkBehaviour {
         // Add velocity to the bullet
         rocket.GetComponent<Rigidbody>().velocity = rocket.transform.forward * 6;
 
+        // Spawn rocket
+        NetworkServer.Spawn(rocket);
+
         // Destroy the bullet after 2 seconds
         Destroy(rocket, 2.0f);
+
     }
 
     public float strangeAxisClamp(float value, float limit1, float limit2)
