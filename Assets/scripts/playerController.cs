@@ -10,6 +10,8 @@ public class playerController : NetworkBehaviour {
     public CursorLockMode cursorState = CursorLockMode.None;
     public float movAccel = 10;
     public float jumpAccel = 300;
+    double fireRate = 0.5;
+    private double lastShot = 0.0;
     public GameObject rocketPrefab;
     Transform rocketSpawn;
     Rigidbody rb;
@@ -55,20 +57,25 @@ public class playerController : NetworkBehaviour {
     [Command]
     void CmdFire()
     {
-        // Create the Bullet from the Bullet Prefab
-        var rocket = (GameObject)Instantiate(
-            rocketPrefab,
-            rocketSpawn.position,
-            rocketSpawn.rotation);
+        if (Time.time > fireRate + lastShot)
+        {
+            // Create the Bullet from the Bullet Prefab
+            var rocket = (GameObject)Instantiate(
+                rocketPrefab,
+                rocketSpawn.position,
+                rocketSpawn.rotation);
 
-        // Add velocity to the bullet
-        rocket.GetComponent<Rigidbody>().velocity = rocket.transform.forward * 6;
+            // Add velocity to the bullet
+            rocket.GetComponent<Rigidbody>().velocity = rocket.transform.forward * 40;
 
-        // Spawn rocket
-        NetworkServer.Spawn(rocket);
+            // Spawn rocket
+            NetworkServer.Spawn(rocket);
+            lastShot = Time.time;
 
-        // Destroy the bullet after 2 seconds
-        Destroy(rocket, 2.0f);
+            // Destroy the bullet after 2 seconds
+            Destroy(rocket, 2.0f);
+
+        }
 
     }
 

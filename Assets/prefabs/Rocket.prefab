@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 54140592481846286}
   - component: {fileID: 114763159455772336}
   - component: {fileID: 114632219209884986}
+  - component: {fileID: 114841441695780396}
   m_Layer: 0
   m_Name: Rocket
   m_TagString: Untagged
@@ -39,8 +40,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1317709605739224}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.19842815, y: -0.99068594, z: 0.60442686}
-  m_LocalScale: {x: 2, y: 1, z: 1}
+  m_LocalPosition: {x: -1.6436261, y: 0.1, z: 7.163487}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -150,6 +151,17 @@ MonoBehaviour:
     i15: 63
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 0
+--- !u!114 &114841441695780396
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1317709605739224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f39ce2d175f10af4d9f68c6bbc4e29c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!135 &135291018041689326
 SphereCollider:
   m_ObjectHideFlags: 1
