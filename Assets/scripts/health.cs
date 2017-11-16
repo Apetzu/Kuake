@@ -6,20 +6,25 @@ using UnityEngine.UI;
 
 public class health : MonoBehaviour {
 
-    public const int maxHealth = 100;
-    public int currentHealth = maxHealth;
+    const float maxHealth = 100;
+    public float currentHealth = maxHealth;
     public RectTransform healthBar;
+    float maxWidth;
 
-    public void TakeDamage(int amount)
+    void Awake()
     {
+        maxWidth = healthBar.rect.width;
+    }
 
+    public void TakeDamage(float amount)
+    {
         currentHealth -= amount;
+
         if (currentHealth <= 0)
         {
-            currentHealth = 0;
-            Debug.Log("Dead!");
+            Debug.Log("Död.");
         }
 
-        healthBar.sizeDelta = new Vector2(currentHealth, healthBar.sizeDelta.y);
+        healthBar.sizeDelta = new Vector2(maxWidth * (currentHealth / maxHealth), healthBar.rect.height);
     }
 }
