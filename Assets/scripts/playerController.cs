@@ -1,25 +1,32 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Networking;
 
-public class playerController : MonoBehaviour {
+public class playerController : NetworkBehaviour {
 
-    Camera camera;
+    Camera playerCamera;
     public float mouseSensitivity = 5;
     public CursorLockMode cursorState = CursorLockMode.None;
     public float movAccel = 10;
     public float jumpAccel = 300;
-    BoxCollider bc;
     Rigidbody rb;
     int jump = 0;
 
     void Awake()
     {
-        camera = transform.Find("playerCamera").GetComponent<Camera>();
+		playerCamera = transform.Find("playerCamera").GetComponent<Camera>();
         Cursor.lockState = cursorState;
         rb = GetComponent<Rigidbody>();
-        bc = GetComponent<BoxCollider>();
     }
+
+	void Update()
+	{
+		if (!isLocalPlayer)
+		{
+			return;
+		}
+	}
 
     void FixedUpdate()
     {
@@ -29,7 +36,7 @@ public class playerController : MonoBehaviour {
 
         rb.MoveRotation(Quaternion.Euler(0, rb.rotation.eulerAngles.y + mouseDelta.x, 0));
         //mainCamera.transform.Rotate(new Vector3(-mouseDelta.y, 0, 0)); This doesn't have clamping capability
-        camera.transform.localRotation = Quaternion.Euler(strangeAxisClamp(-mouseDelta.y + camera.transform.localRotation.eulerAngles.x, 90, 270), 0, 0);
+		playerCamera.transform.localRotation = Quaternion.Euler(strangeAxisClamp(-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x, 90, 270), 0, 0);
 
         jump = 0;
     }
