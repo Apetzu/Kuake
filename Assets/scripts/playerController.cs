@@ -34,6 +34,8 @@ public class playerController : NetworkBehaviour {
             return;
         }
 
+        transform.Find("shades").gameObject.SetActive(false);
+
         if (axis2Bool("Fire"))
         {
             CmdFire();
