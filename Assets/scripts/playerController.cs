@@ -37,6 +37,11 @@ public class playerController : NetworkBehaviour {
             CmdFire();
         }
 
+        if (axis2Bool("Menu"))
+        {
+            transform.position = new Vector3(0, 5, 0);
+        }
+
         rb.AddRelativeForce (Vector3.Scale (new Vector3 (Input.GetAxisRaw ("Horizontal"), jump, Input.GetAxisRaw ("Vertical")).normalized, new Vector3 (movAccel * rb.mass, jumpAccel, movAccel * rb.mass)));
 
 		Vector2 mouseDelta = mouseMovement () * mouseSensitivity;
