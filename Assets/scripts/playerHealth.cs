@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class health : MonoBehaviour {
+public class playerHealth : MonoBehaviour {
 
     const float maxHealth = 100;
     public float currentHealth = maxHealth;
@@ -22,7 +22,7 @@ public class health : MonoBehaviour {
 
         if (currentHealth <= 0)
         {
-            Debug.Log("Död.");
+            Debug.Log(this.gameObject + " object is död.");
         }
 
         healthBar.sizeDelta = new Vector2(maxWidth * (currentHealth / maxHealth), healthBar.rect.height);

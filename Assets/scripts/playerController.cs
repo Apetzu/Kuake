@@ -5,56 +5,82 @@ using UnityEngine.Networking;
 
 public class playerController : NetworkBehaviour {
 
-    Camera playerCamera;
     public float mouseSensitivity = 5;
-    public float movSpeed = 10;
-    public float smoothSpeed = 5;
+    public float movSpeed = 4;
+    public float sprintSpeedAdd = 4;
+    public float smoothSpeed = 0.6f;
     public float jumpForce = 300;
     public float fireRate = 0.5f;
+    public float groundDetectionDist = 0.2f;
+    public bool isThisLocalPlayer = false;
     public CursorLockMode cursorState = CursorLockMode.None;
+
     double lastShot = 0.0;
     Vector3 currentVelocity;
+    bool jumping = false;
 
+    public Camera playerCamera;
     public GameObject rocketPrefab;
-    Transform rocketSpawn;
+    public Transform rocketLauncher;
+    public GameObject HUD;
+    public GameObject shades;
     Rigidbody rb;
+    MeshRenderer playerModel;
+    CapsuleCollider playerCollider;
 
     void Awake()
     {
-		playerCamera = transform.Find("playerCamera").GetComponent<Camera>();
         Cursor.lockState = cursorState;
         rb = GetComponent<Rigidbody>();
-        rocketSpawn = transform.Find("rocketSpawn");
+        playerModel = GetComponent<MeshRenderer>();
+        playerCollider = GetComponent<CapsuleCollider>();
     }
 
     void FixedUpdate()
     {
-        if (!isLocalPlayer)
+        if (isLocalPlayer)
         {
-            playerCamera.enabled = false;
-            return;
+            if (Input.GetButton("Fire"))
+            {
+                CmdFire();
+            }
+
+            if (Input.GetButton("Menu"))
+            {
+                transform.position = new Vector3(0, 5, 0);
+            }
+
+            Vector2 mouseDelta = mouseMovement() * mouseSensitivity;
+            Vector3 deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))) * (movSpeed + Input.GetAxisRaw("Sprint") * sprintSpeedAdd);
+
+            rb.MovePosition(Vector3.SmoothDamp(rb.position, rb.position + transform.TransformDirection(deltaPos), ref currentVelocity, smoothSpeed, Mathf.Infinity, Time.deltaTime));
+
+            if (Input.GetButton("Jump") && jumping == false)
+            {
+                if (playerGrounded())
+                {
+                    jumping = true;
+                    rb.velocity = new Vector3 (rb.velocity.x, 0f, rb.velocity.z);
+                    rb.AddForce(Vector3.up * jumpForce);
+                }
+            }
+            else if (!Input.GetButton("Jump"))
+            {
+                jumping = false;
+            }
+
+            rb.MoveRotation(Quaternion.Euler(0, rb.rotation.eulerAngles.y + mouseDelta.x, 0));
+            playerCamera.transform.localRotation = Quaternion.Euler(strangeAxisClamp(-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x, 90, 270), 0, 0);
         }
+    }
 
-        transform.Find("shades").gameObject.SetActive(false);
-
-        if (axis2Bool("Fire"))
-        {
-            CmdFire();
-        }
-
-        if (axis2Bool("Menu"))
-        {
-            transform.position = new Vector3(0, 5, 0);
-        }
-
-        Vector2 mouseDelta = mouseMovement () * mouseSensitivity;
-        Vector3 deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")));
-
-        rb.MovePosition(Vector3.SmoothDamp(rb.position, rb.position + transform.TransformDirection(deltaPos * movSpeed), ref currentVelocity, smoothSpeed, Mathf.Infinity, Time.deltaTime));
-
-		rb.MoveRotation (Quaternion.Euler (0, rb.rotation.eulerAngles.y + mouseDelta.x, 0));
-		playerCamera.transform.localRotation = Quaternion.Euler (strangeAxisClamp (-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x, 90, 270), 0, 0);
-
+    public override void OnStartLocalPlayer()
+    {
+        playerCamera.gameObject.SetActive(true);
+        HUD.SetActive(true);
+        shades.SetActive(false);
+        playerModel.enabled = false;
+        isThisLocalPlayer = true;
     }
 
     [Command]
@@ -63,13 +89,7 @@ public class playerController : NetworkBehaviour {
         if (Time.time >= fireRate + lastShot)
         {
             // Create the Bullet from the Bullet Prefab
-            var rocket = (GameObject)Instantiate(
-                rocketPrefab,
-                rocketSpawn.position,
-                rocketSpawn.rotation);
-
-            // Add velocity to the bullet
-            rocket.GetComponent<Rigidbody>().velocity = rocket.transform.forward * 40;
+            GameObject rocket = Instantiate(rocketPrefab, rocketLauncher.position, rocketLauncher.rotation);
 
             // Spawn rocket
             NetworkServer.Spawn(rocket);
@@ -77,9 +97,7 @@ public class playerController : NetworkBehaviour {
 
             // Destroy the bullet after 2 seconds
             Destroy(rocket, 2.0f);
-
         }
-
     }
 
     public float strangeAxisClamp(float value, float limit1, float limit2)
@@ -96,9 +114,11 @@ public class playerController : NetworkBehaviour {
         return new Vector2 (Input.GetAxisRaw ("Mouse X"), Input.GetAxisRaw ("Mouse Y"));
     }
 
-    public bool axis2Bool(string axisName)
+    public bool playerGrounded()
     {
-        if (Input.GetAxisRaw (axisName) == 1)
+        Vector3 rayPos = new Vector3(transform.position.x, transform.position.y - playerCollider.height / 2 + 0.2f, transform.position.z);
+
+        if (Physics.Raycast(rayPos, Vector3.down, groundDetectionDist + 0.2f, ~(1 << LayerMask.NameToLayer("Player"))))
             return true;
         else
             return false;
