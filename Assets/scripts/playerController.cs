@@ -18,12 +18,14 @@ public class playerController : NetworkBehaviour {
     double lastShot = 0.0;
     Vector3 currentVelocity;
     bool jumping = false;
+    bool shootingHold = false;
 
     public Camera playerCamera;
     public GameObject rocketPrefab;
-    public Transform rocketLauncher;
+    public GameObject rocketLauncher;
     public GameObject HUD;
     public GameObject shades;
+    public GameObject FPW;
     Rigidbody rb;
     MeshRenderer playerModel;
     CapsuleCollider playerCollider;
@@ -42,7 +44,15 @@ public class playerController : NetworkBehaviour {
         {
             if (Input.GetButton("Fire"))
             {
-                CmdFire();
+                if (shootingHold == false)
+                {
+                    shootingHold = true;
+                    CmdFire();
+                }
+            }
+            else
+            {
+                shootingHold = false;
             }
 
             if (Input.GetButton("Menu"))
@@ -55,16 +65,16 @@ public class playerController : NetworkBehaviour {
 
             rb.MovePosition(Vector3.SmoothDamp(rb.position, rb.position + transform.TransformDirection(deltaPos), ref currentVelocity, smoothSpeed, Mathf.Infinity, Time.deltaTime));
 
-            if (Input.GetButton("Jump") && jumping == false)
+            if (Input.GetButton("Jump"))
             {
-                if (playerGrounded())
+                if (playerGrounded() && jumping == false)
                 {
                     jumping = true;
                     rb.velocity = new Vector3 (rb.velocity.x, 0f, rb.velocity.z);
                     rb.AddForce(Vector3.up * jumpForce);
                 }
             }
-            else if (!Input.GetButton("Jump"))
+            else
             {
                 jumping = false;
             }
@@ -77,9 +87,11 @@ public class playerController : NetworkBehaviour {
     public override void OnStartLocalPlayer()
     {
         playerCamera.gameObject.SetActive(true);
+        FPW.gameObject.SetActive(true);
         HUD.SetActive(true);
         shades.SetActive(false);
         playerModel.enabled = false;
+        rocketLauncher.SetActive(false);
         isThisLocalPlayer = true;
     }
 
@@ -89,7 +101,7 @@ public class playerController : NetworkBehaviour {
         if (Time.time >= fireRate + lastShot)
         {
             // Create the Bullet from the Bullet Prefab
-            GameObject rocket = Instantiate(rocketPrefab, rocketLauncher.position, rocketLauncher.rotation);
+            GameObject rocket = Instantiate(rocketPrefab, rocketLauncher.transform.position, rocketLauncher.transform.rotation);
 
             // Spawn rocket
             NetworkServer.Spawn(rocket);
@@ -118,7 +130,7 @@ public class playerController : NetworkBehaviour {
     {
         Vector3 rayPos = new Vector3(transform.position.x, transform.position.y - playerCollider.height / 2 + 0.2f, transform.position.z);
 
-        if (Physics.Raycast(rayPos, Vector3.down, groundDetectionDist + 0.2f, ~(1 << LayerMask.NameToLayer("Player"))))
+        if (Physics.Raycast(rayPos, Vector3.down, groundDetectionDist + 0.2f))
             return true;
         else
             return false;
