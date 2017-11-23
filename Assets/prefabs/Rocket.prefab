@@ -55,7 +55,6 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -71,7 +70,6 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -168,6 +166,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 10
   speed: 2
+  explosionPrefab: {fileID: 1766342354337212, guid: cb0b9280cce83b5448075f3573f45e54,
+    type: 2}
 --- !u!136 &136717543563753294
 CapsuleCollider:
   m_ObjectHideFlags: 1

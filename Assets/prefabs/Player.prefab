@@ -541,7 +541,7 @@ MonoBehaviour:
   fireRate: 0.2
   groundDetectionDist: 0.2
   isThisLocalPlayer: 0
-  cursorState: 0
+  cursorState: 1
   playerCamera: {fileID: 20451790586770088}
   rocketPrefab: {fileID: 1317709605739224, guid: ef4287a05242b0f4eb3cc8d4f38ad83f,
     type: 2}
