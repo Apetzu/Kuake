@@ -16,8 +16,6 @@ public class playerHealth : NetworkBehaviour {
     float maxWidth;
     private NetworkStartPosition[] spawnPoints;
 
-
-
     void Start()
     {
         if (isLocalPlayer)
@@ -25,7 +23,6 @@ public class playerHealth : NetworkBehaviour {
             spawnPoints = FindObjectsOfType<NetworkStartPosition>();
         }
     }
-
 
     void Awake()
     {
@@ -54,8 +51,6 @@ public class playerHealth : NetworkBehaviour {
             // called on the Server, but invoked on the Clients
             RpcRespawn();
         }
-
-
 
     }
 

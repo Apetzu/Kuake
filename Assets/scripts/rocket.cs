@@ -13,17 +13,6 @@ public class rocket : MonoBehaviour {
         transform.Translate(Vector3.up * speed);
     }
 
-
-    // Very experimental physicpumpum
-    /*void OnCollisionEnter(Collision c)
-    {
-        Instantiate(explosionPrefab,
-                   transform.position,
-                   Quaternion.identity);
-
-        Destroy(gameObject);
-    }*/
-
     void OnTriggerEnter(Collider collider)
     {
         if (collider.gameObject.tag == "Player")
@@ -43,14 +32,5 @@ public class rocket : MonoBehaviour {
                    explosionPrefab.transform.rotation);
             Destroy(this.gameObject);
         }
-
-        /*if (collider.gameObject.tag == "Player")
-        {
-            if (collider.gameObject.GetComponent<playerController>().isThisLocalPlayer == false)
-            {
-                collider.gameObject.GetComponent<playerHealth>().TakeDamage(damage);
-                Destroy(this.gameObject);
-            }
-        }*/
     }
 }

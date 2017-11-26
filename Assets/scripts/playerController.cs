@@ -22,6 +22,7 @@ public class playerController : NetworkBehaviour {
 	public GameObject HUD;
 	public GameObject shades;
 	public GameObject FPW;
+    public Camera playerCamera;
 
 
 	double lastShot = 0.0;
@@ -29,7 +30,6 @@ public class playerController : NetworkBehaviour {
     bool jumping = false;
     bool shootingHold = false;
 
-	public Camera playerCamera;
 	Rigidbody rb;
 	MeshRenderer playerModel;
 	CapsuleCollider playerCollider;
@@ -112,7 +112,7 @@ public class playerController : NetworkBehaviour {
     {
         if (Time.time >= fireRate + lastShot)
         {
-            GameObject rocket = Instantiate(rocketPrefab, rocketLauncher.transform.position, rocketLauncher.transform.rotation);
+            GameObject rocket = Instantiate(rocketPrefab, rocketLauncher.transform.position, Quaternion.Euler(playerCamera.transform.eulerAngles.x + 90, transform.eulerAngles.y, 0));
 
             NetworkServer.Spawn(rocket);
             lastShot = Time.time;
