@@ -27,8 +27,11 @@ public class playerController : NetworkBehaviour {
 
 	double lastShot = 0.0;
     Vector3 currentVelocity;
-    bool jumping = false;
+    bool jumpKey = false;
+    bool playerOnGround = true;
     bool shootingHold = false;
+    Vector3 deltaPos = Vector3.zero;
+    Vector3 lastPos = Vector3.zero;
 
 	Rigidbody rb;
 	MeshRenderer playerModel;
@@ -66,31 +69,46 @@ public class playerController : NetworkBehaviour {
                 transform.position = new Vector3(0, 5, 0);
             }
 				
-            // Next mouse and player movement changes
+            // Next mouse movement change
 			Vector2 mouseDelta = mouseMovement() * mouseSensitivity;
-            Vector3 deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))) * (movSpeed + Input.GetAxisRaw("Sprint") * sprintSpeedAdd);
 
-			// Applying player movement (position)
-			rb.MovePosition(Vector3.SmoothDamp(rb.position, rb.position + transform.TransformDirection(deltaPos), ref currentVelocity, smoothSpeed, Mathf.Infinity, Time.deltaTime));
+            playerOnGround = playerGrounded();
+
+            // Next player movement change
+            if (playerOnGround)
+            {
+                deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))) * (movSpeed /* + Input.GetAxisRaw("Sprint") * sprintSpeedAdd */); // sprint disabled
+            }
+            else // In air (bunny hopping)
+            {
+                
+            }
+
+            // Applying player ground movement (position)
+            rb.MovePosition(Vector3.SmoothDamp(rb.position, rb.position + transform.TransformDirection(deltaPos), ref currentVelocity, smoothSpeed, Mathf.Infinity, Time.deltaTime));
 
 			// Jumping (Space key)
 			if (Input.GetButton("Jump"))
             {
-                if (playerGrounded() && jumping == false)
+                if (playerOnGround && jumpKey == false)
                 {
-                    jumping = true;
+                    jumpKey = true;
                     rb.velocity = new Vector3 (rb.velocity.x, 0f, rb.velocity.z);
                     rb.AddForce(Vector3.up * jumpForce);
                 }
             }
             else
             {
-                jumping = false;
+                jumpKey = false;
             }
 
 			// Applying mouse movement (rotation)
 			rb.MoveRotation(Quaternion.Euler(0, rb.rotation.eulerAngles.y + mouseDelta.x, 0));
             playerCamera.transform.localRotation = Quaternion.Euler(strangeAxisClamp(-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x, 90, 270), 0, 0);
+
+            Debug.Log(rb.position - lastPos);
+
+            lastPos = rb.position;
         }
     }
 
