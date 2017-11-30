@@ -7,10 +7,11 @@ using UnityEngine.Networking;
 
 public class playerHealth : NetworkBehaviour {
 
-    const float maxHealth = 100;
+    const float maxHealth = 200;
+	const float spawnHealth = 100;
 
     [SyncVar(hook = "OnChangeHealth")]
-    public float currentHealth = maxHealth;
+    public float currentHealth = spawnHealth;
 
     public RectTransform healthBar;
     float maxWidth;
@@ -31,8 +32,20 @@ public class playerHealth : NetworkBehaviour {
 
     void OnChangeHealth (float currentHealth)
     {
-        healthBar.sizeDelta = new Vector2(maxWidth * (currentHealth / maxHealth), healthBar.rect.height);
+        healthBar.sizeDelta = new Vector2(maxWidth * (currentHealth / spawnHealth), healthBar.rect.height);
     }
+
+	public void AddHealth (float addedHealth)
+	{
+		// Add health to player, also checks added health to make sure we won't go over maxHP
+		if (isLocalPlayer && (currentHealth + addedHealth) < maxHealth) {
+			currentHealth += addedHealth;
+		} 
+		else if (isLocalPlayer && (currentHealth + addedHealth) >= maxHealth) {
+			currentHealth = maxHealth;
+		} 
+					
+	}
 
     public void TakeDamage(float amount)
     {
@@ -46,7 +59,7 @@ public class playerHealth : NetworkBehaviour {
 
         if (currentHealth <= 0)
         {
-            currentHealth = maxHealth;
+            currentHealth = spawnHealth;
 
             // called on the Server, but invoked on the Clients
             RpcRespawn();
