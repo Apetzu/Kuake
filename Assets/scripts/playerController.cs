@@ -81,7 +81,7 @@ public class playerController : NetworkBehaviour {
             }
             else // In air (bunny hopping)
             {
-                
+				deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))) * (movSpeed /* + Input.GetAxisRaw("Sprint") * sprintSpeedAdd */); // sprint disabled
             }
 
             // Applying player ground movement (position)
@@ -104,11 +104,11 @@ public class playerController : NetworkBehaviour {
 
 			// Applying mouse movement (rotation)
 			rb.MoveRotation(Quaternion.Euler(0, rb.rotation.eulerAngles.y + mouseDelta.x, 0));
-            playerCamera.transform.localRotation = Quaternion.Euler(strangeAxisClamp(-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x, 90, 270), 0, 0);
+			playerCamera.transform.localRotation = Quaternion.Euler(strangeAxisClamp(-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x, 90, 270), 0, 0);
 
-            Debug.Log(rb.position - lastPos);
+            //Debug.Log(rb.position - lastPos);
 
-            lastPos = rb.position;
+            //lastPos = rb.position;
         }
     }
 
@@ -133,6 +133,7 @@ public class playerController : NetworkBehaviour {
             GameObject rocket = Instantiate(rocketPrefab, rocketLauncher.transform.position, Quaternion.Euler(playerCamera.transform.eulerAngles.x + 90, transform.eulerAngles.y, 0));
 
             NetworkServer.Spawn(rocket);
+			rocket.GetComponent<rocket>().spawner = this.gameObject;
             lastShot = Time.time;
 
             Destroy(rocket, 2.0f);

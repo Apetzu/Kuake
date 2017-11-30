@@ -1,12 +1,13 @@
 ﻿using System.Collections;
+using UnityEngine.Networking;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class rocket : MonoBehaviour {
+public class rocket : NetworkBehaviour {
 
-    public float damage = 10;
-    public float speed = 2;
-    public GameObject explosionPrefab;
+	public float speed = 2;
+	public GameObject explosionPrefab;
+	public GameObject spawner;
 
     void FixedUpdate()
     {
@@ -15,21 +16,11 @@ public class rocket : MonoBehaviour {
 
     void OnTriggerEnter(Collider collider)
     {
-        if (collider.gameObject.tag == "Player")
+		if (collider.gameObject != spawner)
         {
-            if (collider.gameObject.GetComponent<playerController>().isThisLocalPlayer == false)
-            {
-                Instantiate(explosionPrefab,
-                   transform.position,
-                   explosionPrefab.transform.rotation);
-                Destroy(this.gameObject);
-            }
-        }
-        else
-        {
-            Instantiate(explosionPrefab,
-                   transform.position,
-                   explosionPrefab.transform.rotation);
+			Instantiate(explosionPrefab,
+               transform.position,
+               explosionPrefab.transform.rotation);
             Destroy(this.gameObject);
         }
     }
