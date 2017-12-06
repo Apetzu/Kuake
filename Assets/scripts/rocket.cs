@@ -9,9 +9,9 @@ public class rocket : NetworkBehaviour {
 	public GameObject explosionPrefab;
 	public GameObject spawner;
 
-    void FixedUpdate()
+    void Update()
     {
-        transform.Translate(Vector3.up * speed);
+        transform.Translate(Vector3.up * speed * Time.deltaTime);
     }
 
     void OnTriggerEnter(Collider collider)

@@ -8,9 +8,9 @@ public class playerController : NetworkBehaviour {
     // Possible to edit in Unity editor
 	public float mouseSensitivity = 5;
     public float movSpeed = 4;									// = max player speed
-    public float sprintSpeedAdd = 4;							// = added sprint speed when sprinting
-    public float smoothSpeed = 0.6f;							// = how fast player gets to max speed
-    public float jumpForce = 300;
+    //public float sprintSpeedAdd = 4;							// = added sprint speed when sprinting. sprinting is now disabled
+    public float jumpAcceleration = 5;
+    public float clampVelocity = 500;
     public float fireRate = 0.5f;								// = how fast player is able to shoot
     public float groundDetectionDist = 0.2f;					// = lenght of the ground check raycast
     public bool isThisLocalPlayer = false;						// = tells to other scripts if this player is the local player
@@ -28,10 +28,9 @@ public class playerController : NetworkBehaviour {
 	double lastShot = 0.0;
     Vector3 currentVelocity;
     bool jumpKey = false;
-    bool playerOnGround = true;
     bool shootingHold = false;
     Vector3 deltaPos = Vector3.zero;
-    Vector3 lastPos = Vector3.zero;
+    //Vector3 lastPos = Vector3.zero;
 
 	Rigidbody rb;
 	MeshRenderer playerModel;
@@ -47,54 +46,24 @@ public class playerController : NetworkBehaviour {
 
     void FixedUpdate()
     {
-		if (isLocalPlayer)	// If this player is the local player
+		// Movement is done in this update
+        if (isLocalPlayer)	// If this player is the local player
         {
-			// Shooting (Left click)
-			if (Input.GetButton("Fire"))
-            {
-                if (shootingHold == false)
-                {
-                    shootingHold = true;
-                    CmdFire();
-                }
-            }
-            else
-            {
-                shootingHold = false;
-            }
-
-			// Respawn (temporary, ESC key)
-			if (Input.GetButton("Menu"))
-            {
-                transform.position = new Vector3(0, 5, 0);
-            }
-				
             // Next mouse movement change
 			Vector2 mouseDelta = mouseMovement() * mouseSensitivity;
 
-            playerOnGround = playerGrounded();
+            deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))) * (movSpeed/* + Input.GetAxisRaw("Sprint") * sprintSpeedAdd */); // sprint disabled
 
-            // Next player movement change
-            if (playerOnGround)
-            {
-                deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))) * (movSpeed /* + Input.GetAxisRaw("Sprint") * sprintSpeedAdd */); // sprint disabled
-            }
-            else // In air (bunny hopping)
-            {
-				deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))) * (movSpeed /* + Input.GetAxisRaw("Sprint") * sprintSpeedAdd */); // sprint disabled
-            }
+            rb.AddRelativeForce(deltaPos);
 
-            // Applying player ground movement (position)
-            rb.MovePosition(Vector3.SmoothDamp(rb.position, rb.position + transform.TransformDirection(deltaPos), ref currentVelocity, smoothSpeed, Mathf.Infinity, Time.deltaTime));
-
-			// Jumping (Space key)
+            // Jumping (Space key)
 			if (Input.GetButton("Jump"))
             {
-                if (playerOnGround && jumpKey == false)
+                if (playerGrounded() && jumpKey == false)
                 {
                     jumpKey = true;
                     rb.velocity = new Vector3 (rb.velocity.x, 0f, rb.velocity.z);
-                    rb.AddForce(Vector3.up * jumpForce);
+                    rb.AddForce(Vector3.up * rb.mass * (-Physics.gravity.y + jumpAcceleration / Time.deltaTime));
                 }
             }
             else
@@ -109,6 +78,33 @@ public class playerController : NetworkBehaviour {
             //Debug.Log(rb.position - lastPos);
 
             //lastPos = rb.position;
+        }
+    }
+
+    void Update()
+    {
+        // All the non movement things are done in this update
+        if (isLocalPlayer)  // If this player is the local player
+        {
+            // Shooting (Left click)
+            if (Input.GetButton("Fire"))
+            {
+                if (shootingHold == false)
+                {
+                    shootingHold = true;
+                    CmdFire();
+                }
+            }
+            else
+            {
+                shootingHold = false;
+            }
+
+            // Respawn (temporary, ESC key)
+            if (Input.GetButton("Menu"))
+            {
+                transform.position = new Vector3(0, 5, 0);
+            }
         }
     }
 
