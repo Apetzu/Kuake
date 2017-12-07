@@ -4,14 +4,18 @@ using UnityEngine;
 
 public class explosion : MonoBehaviour {
 
-    ParticleSystem ps;
-    public float radius = 10;
-    public float explosionForce = 10;
-	public float damage = 10;
+    [SerializeField]
+    private ParticleSystem explosionParticle;
+    [SerializeField]
+    private float radius = 5;
+    [SerializeField]
+    private float explosionForce = 500;
+    [SerializeField]
+    private float damage = 10;
 
-    void Start () 
+    void Awake()
     {
-        ps = GetComponent<ParticleSystem>();
+        explosionParticle = GetComponent<ParticleSystem>();
 
         Collider[] hits = Physics.OverlapSphere(transform.position, radius);
 
@@ -19,16 +23,21 @@ public class explosion : MonoBehaviour {
         {
             if (obj.attachedRigidbody != null)
             {
-				//obj.GetComponent<playerHealth>().TakeDamage ((1 - Vector3.Distance (obj.transform.position, transform.position) / radius) * damage);
 				obj.attachedRigidbody.AddExplosionForce(explosionForce * Time.deltaTime, transform.position, radius, 1, ForceMode.Impulse);
-				//obj.GetComponent<playerHealth>().TakeDamage (damage);
-			}
+            }
+
+            if (obj.tag == "Player")
+            {
+                obj.GetComponent<playerHealth>().TakeDamage((1 - Vector3.Distance(obj.transform.position, transform.position) / radius) * damage);
+            }
         }
 	}
 	
 	void Update () 
     {
-        if (ps.isStopped)
+        if (explosionParticle.isStopped)
+        {
             Destroy(this.gameObject);
-	}
+        }
+    }
 }

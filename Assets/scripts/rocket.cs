@@ -5,18 +5,21 @@ using UnityEngine;
 
 public class rocket : NetworkBehaviour {
 
-	public float speed = 2;
-	public GameObject explosionPrefab;
-	public GameObject spawner;
+    [SerializeField]
+    private float speed = 2;
+    [SerializeField]
+    private GameObject explosionPrefab;
 
-    void Update()
+	public GameObject Spawner;
+
+    void FixedUpdate()
     {
         transform.Translate(Vector3.up * speed * Time.deltaTime);
     }
 
     void OnTriggerEnter(Collider collider)
     {
-		if (collider.gameObject != spawner)
+		if (collider.gameObject != Spawner)
         {
 			Instantiate(explosionPrefab,
                transform.position,

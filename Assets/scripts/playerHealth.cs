@@ -7,77 +7,77 @@ using UnityEngine.Networking;
 
 public class playerHealth : NetworkBehaviour {
 
-    const float maxHealth = 200;
-	const float spawnHealth = 100;
+    [SerializeField]
+    private RectTransform healthBar;
+    [SerializeField]
+    private float maxHealth = 200;
+    [SerializeField]
+    private float spawnHealth = 100;
 
-    [SyncVar(hook = "OnChangeHealth")]
-    public float currentHealth = spawnHealth;
+    [SyncVar(hook = "UIChangeHealth")]
+    public float CurrentHealth = 0.0f;
 
-    public RectTransform healthBar;
-    float maxWidth;
-    private NetworkStartPosition[] spawnPoints;
+    float startWidth;
+    NetworkStartPosition[] spawnPoints;
+    playerArmor armor;
 
-    void Start()
+    void Awake()
     {
+        CurrentHealth = spawnHealth;
+        startWidth = healthBar.sizeDelta.x;
+        armor = GetComponent<playerArmor>();
+
         if (isLocalPlayer)
         {
             spawnPoints = FindObjectsOfType<NetworkStartPosition>();
         }
     }
 
-    void Awake()
+    void UIChangeHealth (float CurrentHealth)
     {
-        maxWidth = healthBar.rect.width;
+        healthBar.sizeDelta = new Vector2(startWidth * (CurrentHealth / maxHealth), healthBar.rect.height);
     }
 
-    void OnChangeHealth (float currentHealth)
-    {
-        healthBar.sizeDelta = new Vector2(maxWidth * (currentHealth / spawnHealth), healthBar.rect.height);
-    }
-
-	public void AddHealth (float addedHealth)
+	public void AddHealth (float AddedHealth)
 	{
 		// Add health to player, also checks added health to make sure we won't go over maxHP
-		if ((currentHealth + addedHealth) < maxHealth) {
-			currentHealth += addedHealth;
+		if ((CurrentHealth + AddedHealth) < maxHealth) {
+			CurrentHealth += AddedHealth;
 		} 
-		else if ((currentHealth + addedHealth) >= maxHealth) {
-			currentHealth = maxHealth;
+		else if ((CurrentHealth + AddedHealth) >= maxHealth) {
+			CurrentHealth = maxHealth;
 		} 
 					
 	}
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(float Amount)
     {
-
         if (!isServer)
         {
             return;
         }
 		// If 0 armor but hp 1+, just reduce hp
-		if (currentHealth > 0 && GameObject.Find ("playerArmor").GetComponent<playerArmor>().currentArmor == 0) 
+		if (CurrentHealth > 0 && armor.currentArmor == 0) 
 		{
-			currentHealth -= amount;
+			CurrentHealth -= Amount;
 		}
 		// If more armor than damage, reduce just armor
-		else if (currentHealth > 0 && GameObject.Find("playerArmor").GetComponent<playerArmor>().currentArmor >= amount)
+		else if (CurrentHealth > 0 && armor.currentArmor >= Amount)
 		{
-			GameObject.Find ("playerArmor").GetComponent<playerArmor>().currentArmor -= amount;
+			armor.currentArmor -= Amount;
 		}
 		// If less armor than damage, reduce armor and rest of the damage from hp
-		else if (currentHealth > 0 && GameObject.Find("playerArmor").GetComponent<playerArmor>().currentArmor < amount)
+		else if (CurrentHealth > 0 && armor.currentArmor < Amount)
 		{
-			float hpdmg = amount - GameObject.Find("playerArmor").GetComponent<playerArmor>().currentArmor;
-			GameObject.Find ("playerArmor").GetComponent<playerArmor>().currentArmor -= GameObject.Find("playerArmor").GetComponent<playerArmor>().currentArmor;
-			currentHealth -= hpdmg;
-		
+			float hpdmg = Amount - armor.currentArmor;
+			armor.currentArmor -= armor.currentArmor;
+			CurrentHealth -= hpdmg;
 		}
-        
-		
+
 		// If hp equal or less than 0, player is dead and we respawn it
-		if (currentHealth <= 0)
+		if (CurrentHealth <= 0)
         {
-            currentHealth = spawnHealth;
+            CurrentHealth = spawnHealth;
 
             // called on the Server, but invoked on the Clients
             RpcRespawn();

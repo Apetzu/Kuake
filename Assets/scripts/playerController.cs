@@ -39,7 +39,7 @@ public class playerController : NetworkBehaviour {
 
     public bool IsThisLocalPlayer = false;                      // = tells to other scripts if this player is the local player
 
-    double lastShot = 0.0;
+    double lastShot = 0.0d;
 	Vector3 currentVelocity;
 	bool jumpKey = false;
 	bool playerOnGround = true;
@@ -69,7 +69,7 @@ public class playerController : NetworkBehaviour {
 			playerOnGround = playerGrounded();
 
 			// Movement change
-			deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))) * (movSpeed /* + Input.GetAxisRaw("Sprint") * sprintSpeedAdd */); // sprint disabled
+			deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"))) * (movSpeed /* + Input.GetAxisRaw("Sprint") * sprintSpeedAdd */); // sprint disabled
 
 			// Applying player ground movement (position)
 			rb.MovePosition(Vector3.SmoothDamp(rb.position, rb.position + transform.TransformDirection(deltaPos), ref currentVelocity, smoothSpeed, Mathf.Infinity, Time.deltaTime));
@@ -90,9 +90,9 @@ public class playerController : NetworkBehaviour {
 			}
 
 			// Applying mouse movement (rotation)
-			rb.MoveRotation(Quaternion.Euler(0, rb.rotation.eulerAngles.y + mouseDelta.x, 0));
-			playerCamera.transform.localRotation = Quaternion.Euler(strangeAxisClamp((-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x), 90, 270), 0, 0);
-		}
+			rb.MoveRotation(Quaternion.Euler(0f, rb.rotation.eulerAngles.y + mouseDelta.x, 0f));
+			playerCamera.transform.localRotation = Quaternion.Euler(strangeAxisClamp((-mouseDelta.y + playerCamera.transform.localRotation.eulerAngles.x), 90f, 270f), 0f, 0f);
+        }
 	}
 
 	void Update()
@@ -106,7 +106,7 @@ public class playerController : NetworkBehaviour {
 				if (shootingHold == false)
 				{
 					shootingHold = true;
-					CmdFire();
+					CmdFire(rocketLauncher.transform.position, transform.rotation, playerCamera.transform.rotation);
 				}
 			}
 			else
@@ -117,7 +117,7 @@ public class playerController : NetworkBehaviour {
 			// Respawn (temporary, ESC key)
 			if (Input.GetButton("Menu"))
 			{
-				transform.position = new Vector3(0, 5, 0);
+				transform.position = new Vector3(0f, 5f, 0f);
 			}
 		}
 	}
@@ -136,14 +136,14 @@ public class playerController : NetworkBehaviour {
 
 	// Spawns a rocket
 	[Command]
-	public void CmdFire()
+	public void CmdFire(Vector3 SpawnPosition, Quaternion PlayerDirection, Quaternion CameraDirection)
 	{
 		if (Time.time >= fireRate + lastShot)
 		{
-			GameObject rocket = Instantiate(rocketPrefab, rocketLauncher.transform.position, Quaternion.Euler(playerCamera.transform.eulerAngles.x + 90, transform.eulerAngles.y, 0));
+            GameObject rocket = Instantiate(rocketPrefab, SpawnPosition, Quaternion.Euler(CameraDirection.eulerAngles.x + 90f, PlayerDirection.eulerAngles.y, 0f));
 
 			NetworkServer.Spawn(rocket);
-			rocket.GetComponent<rocket>().spawner = this.gameObject;
+			rocket.GetComponent<rocket>().Spawner = this.gameObject;
 			lastShot = Time.time;
 
 			Destroy(rocket, 2.0f);
@@ -153,9 +153,9 @@ public class playerController : NetworkBehaviour {
 	// Clamps angles when other angle limit is negative
 	public float strangeAxisClamp(float value, float limit1, float limit2)
 	{
-		if (value > limit1 && value < 180)
+		if (value > limit1 && value < 180f)
 			value = limit1;
-		else if (value > 180 && value < limit2)
+		else if (value > 180f && value < limit2)
 			value = limit2;
 		return value;
 	}
@@ -169,7 +169,7 @@ public class playerController : NetworkBehaviour {
 	// Checks if player is on the ground
 	public bool playerGrounded()
 	{
-		Vector3 rayPos = new Vector3(transform.position.x, transform.position.y - playerCollider.height / 2 + 0.2f, transform.position.z);
+		Vector3 rayPos = new Vector3(transform.position.x, transform.position.y - playerCollider.height / 2f + 0.2f, transform.position.z);
 
 		if (Physics.Raycast(rayPos, Vector3.down, groundDetectionDist + 0.2f))
 			return true;
