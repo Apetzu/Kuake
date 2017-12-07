@@ -576,7 +576,7 @@ Rigidbody:
   m_GameObject: {fileID: 1884605745802370}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 5
+  m_Drag: 0
   m_AngularDrag: 0
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -629,9 +629,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mouseSensitivity: 5
-  movSpeed: 10
+  movSpeed: 4
+  sprintSpeedAdd: 4
+  smoothSpeed: 0.6
   jumpAcceleration: 5
-  clampVelocity: 500
   fireRate: 0.2
   groundDetectionDist: 0.2
   isThisLocalPlayer: 0
