@@ -38,10 +38,10 @@ public class playerHealth : NetworkBehaviour {
 	public void AddHealth (float addedHealth)
 	{
 		// Add health to player, also checks added health to make sure we won't go over maxHP
-		if (isLocalPlayer && (currentHealth + addedHealth) < maxHealth) {
+		if ((currentHealth + addedHealth) < maxHealth) {
 			currentHealth += addedHealth;
 		} 
-		else if (isLocalPlayer && (currentHealth + addedHealth) >= maxHealth) {
+		else if ((currentHealth + addedHealth) >= maxHealth) {
 			currentHealth = maxHealth;
 		} 
 					

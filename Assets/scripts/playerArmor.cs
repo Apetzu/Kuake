@@ -11,14 +11,14 @@ public class playerArmor : NetworkBehaviour {
 	//const float spawnArmor = 0;
 
 	[SyncVar(hook = "OnChangeArmor")]
-	public float currentArmor = 1;
+	public float currentArmor = 0;
 
 	public RectTransform armorBar;
 	float maxWidth;
 
 	void Start()
 	{
-		
+		armorBar.sizeDelta = new Vector2(maxWidth * (currentArmor / maxArmor), armorBar.rect.height);
 	}
 
 	void Awake()
@@ -34,10 +34,10 @@ public class playerArmor : NetworkBehaviour {
 	public void AddArmor (float addedArmor)
 	{
 		// Add armor to player, also checks added armor to make sure we won't go over maxHP
-		if (isLocalPlayer && (currentArmor + addedArmor) < maxArmor) {
+		if ((currentArmor + addedArmor) < maxArmor) {
 			currentArmor += addedArmor;
 		} 
-		else if (isLocalPlayer && (currentArmor + addedArmor) >= maxArmor) {
+		else if ((currentArmor + addedArmor) >= maxArmor) {
 			currentArmor = maxArmor;
 		} 
 
