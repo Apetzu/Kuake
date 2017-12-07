@@ -55,7 +55,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 5
-  explosionForce: 40
+  explosionForce: 500
   damage: 10
 --- !u!114 &114849051312327306
 MonoBehaviour:

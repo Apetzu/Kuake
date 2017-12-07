@@ -7,28 +7,39 @@ public class playerController : NetworkBehaviour {
 
 	// Possible to edit in Unity editor
 	[SerializeField]
-	private float MouseSensitivity = 5;
+	private float mouseSensitivity = 5f;
 	[SerializeField]
-	private float MovSpeed = 4;									// = max player speed
-	[SerializeField]
-	private float SprintSpeedAdd = 4;							// = added sprint speed when sprinting
-	private float smoothSpeed = 0.6f;							// = how fast player gets to max speed
-	private float jumpAcceleration = 300;
-	private float fireRate = 0.5f;								// = how fast player is able to shoot
-	private float groundDetectionDist = 0.2f;					// = lenght of the ground check raycast
-	private bool isThisLocalPlayer = false;						// = tells to other scripts if this player is the local player
-	private CursorLockMode cursorState = CursorLockMode.None;	// = cursor mode: is it visible and locked or not
+	private float movSpeed = 4f;								// = max player speed
+	//[SerializeField]
+	//private float sprintSpeedAdd = 4f;						// = added sprint speed when sprinting. disabled for now
+    [SerializeField]
+    private float smoothSpeed = 0.6f;							// = how fast player gets to max speed
+    [SerializeField]
+    private float jumpAcceleration = 5f;
+    [SerializeField]
+    private float fireRate = 0.2f;								// = how fast player is able to shoot
+    [SerializeField]
+    private float groundDetectionDist = 0.2f;					// = lenght of the ground check raycast
+    [SerializeField]
+    private CursorLockMode cursorState = CursorLockMode.None;   // = cursor mode: is it visible and locked or not
 
-	// Link these to right gameobjects/components in Unity editor
-	public GameObject rocketPrefab;
-	public GameObject rocketLauncher;
-	public GameObject HUD;
-	public GameObject shades;
-	public GameObject FPW;
-	public Camera playerCamera;
+    // Link these to right gameobjects/components in Unity editor
+    [SerializeField]
+    private GameObject rocketPrefab;
+    [SerializeField]
+    private GameObject rocketLauncher;
+    [SerializeField]
+    private GameObject hud;
+    [SerializeField]
+    private GameObject shades;
+    [SerializeField]
+    private GameObject fpw;
+    [SerializeField]
+    private Camera playerCamera;
 
+    public bool IsThisLocalPlayer = false;                      // = tells to other scripts if this player is the local player
 
-	double lastShot = 0.0;
+    double lastShot = 0.0;
 	Vector3 currentVelocity;
 	bool jumpKey = false;
 	bool playerOnGround = true;
@@ -52,13 +63,13 @@ public class playerController : NetworkBehaviour {
 		if (isLocalPlayer) // If this player is the local player
 		{
 			// Next mouse movement change
-			Vector2 mouseDelta = mouseMovement() * MouseSensitivity;
+			Vector2 mouseDelta = mouseMovement() * mouseSensitivity;
 
 			// Checking if player is on the ground
 			playerOnGround = playerGrounded();
 
 			// Movement change
-			deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))) * (MovSpeed /* + Input.GetAxisRaw("Sprint") * SprintSpeedAdd */); // sprint disabled
+			deltaPos = Vector3.Normalize(new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"))) * (movSpeed /* + Input.GetAxisRaw("Sprint") * sprintSpeedAdd */); // sprint disabled
 
 			// Applying player ground movement (position)
 			rb.MovePosition(Vector3.SmoothDamp(rb.position, rb.position + transform.TransformDirection(deltaPos), ref currentVelocity, smoothSpeed, Mathf.Infinity, Time.deltaTime));
@@ -115,12 +126,12 @@ public class playerController : NetworkBehaviour {
 	public override void OnStartLocalPlayer()
 	{
 		playerCamera.gameObject.SetActive(true);
-		FPW.gameObject.SetActive(true);
-		HUD.SetActive(true);
+		fpw.gameObject.SetActive(true);
+		hud.SetActive(true);
 		shades.SetActive(false);
 		playerModel.enabled = false;
 		rocketLauncher.SetActive(false);
-		isThisLocalPlayer = true;
+		IsThisLocalPlayer = true;
 	}
 
 	// Spawns a rocket
