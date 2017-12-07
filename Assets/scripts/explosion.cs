@@ -21,7 +21,8 @@ public class explosion : MonoBehaviour {
             {
 				//obj.GetComponent<playerHealth>().TakeDamage ((1 - Vector3.Distance (obj.transform.position, transform.position) / radius) * damage);
 				obj.attachedRigidbody.AddExplosionForce(explosionForce, transform.position, radius, 1, ForceMode.Impulse);
-            }
+				//obj.GetComponent<playerHealth>().TakeDamage (damage);
+			}
         }
 	}
 	

@@ -54,10 +54,28 @@ public class playerHealth : NetworkBehaviour {
         {
             return;
         }
-
-        currentHealth -= amount;
-
-        if (currentHealth <= 0)
+		// If 0 armor but hp 1+, just reduce hp
+		if (currentHealth > 0 && GameObject.Find ("playerArmor").GetComponent<playerArmor>().currentArmor == 0) 
+		{
+			currentHealth -= amount;
+		}
+		// If more armor than damage, reduce just armor
+		else if (currentHealth > 0 && GameObject.Find("playerArmor").GetComponent<playerArmor>().currentArmor >= amount)
+		{
+			GameObject.Find ("playerArmor").GetComponent<playerArmor>().currentArmor -= amount;
+		}
+		// If less armor than damage, reduce armor and rest of the damage from hp
+		else if (currentHealth > 0 && GameObject.Find("playerArmor").GetComponent<playerArmor>().currentArmor < amount)
+		{
+			float hpdmg = amount - GameObject.Find("playerArmor").GetComponent<playerArmor>().currentArmor;
+			GameObject.Find ("playerArmor").GetComponent<playerArmor>().currentArmor -= GameObject.Find("playerArmor").GetComponent<playerArmor>().currentArmor;
+			currentHealth -= hpdmg;
+		
+		}
+        
+		
+		// If hp equal or less than 0, player is dead and we respawn it
+		if (currentHealth <= 0)
         {
             currentHealth = spawnHealth;
 
