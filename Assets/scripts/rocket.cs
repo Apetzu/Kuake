@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using UnityEngine.Networking;
-using System.Collections.Generic;
+﻿using UnityEngine.Networking;
 using UnityEngine;
 
 public class rocket : NetworkBehaviour {
 
     [SerializeField]
-    private float speed = 2;
+    private float speed = 2f;
     [SerializeField]
     private GameObject explosionPrefab;
 

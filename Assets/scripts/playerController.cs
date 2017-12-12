@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.Networking;
 
 public class playerController : NetworkBehaviour {
@@ -15,7 +13,7 @@ public class playerController : NetworkBehaviour {
     [SerializeField]
     private float smoothSpeed = 0.6f;							// = how fast player gets to max speed
     [SerializeField]
-    private float jumpAcceleration = 5f;
+    private float jumpAcceleration = 250f;
     [SerializeField]
     private float fireRate = 0.2f;								// = how fast player is able to shoot
     [SerializeField]
@@ -58,7 +56,16 @@ public class playerController : NetworkBehaviour {
 		playerCollider = GetComponent<CapsuleCollider>();
 	}
 
-	void FixedUpdate()
+    void Start()
+    {
+        if (!isLocalPlayer)
+        {
+            Destroy(this);
+        }
+            
+    }
+
+    void FixedUpdate()
 	{
 		if (isLocalPlayer) // If this player is the local player
 		{
@@ -81,7 +88,7 @@ public class playerController : NetworkBehaviour {
 				{
 					jumpKey = true;
 					rb.velocity = new Vector3 (rb.velocity.x, 0f, rb.velocity.z);
-					rb.AddForce(Vector3.up * rb.mass * (Physics.gravity.y + jumpAcceleration / Time.deltaTime));
+					rb.AddForce(Vector3.up * rb.mass * (Physics.gravity.y + jumpAcceleration));
 				}
 			}
 			else
@@ -118,6 +125,7 @@ public class playerController : NetworkBehaviour {
 			if (Input.GetButton("Menu"))
 			{
 				transform.position = new Vector3(0f, 5f, 0f);
+                rb.velocity = Vector3.zero;
 			}
 		}
 	}
@@ -131,12 +139,11 @@ public class playerController : NetworkBehaviour {
 		shades.SetActive(false);
 		playerModel.enabled = false;
 		rocketLauncher.SetActive(false);
-		IsThisLocalPlayer = true;
 	}
 
 	// Spawns a rocket
 	[Command]
-	public void CmdFire(Vector3 SpawnPosition, Quaternion PlayerDirection, Quaternion CameraDirection)
+	void CmdFire(Vector3 SpawnPosition, Quaternion PlayerDirection, Quaternion CameraDirection)
 	{
 		if (Time.time >= fireRate + lastShot)
 		{
@@ -149,6 +156,11 @@ public class playerController : NetworkBehaviour {
 			Destroy(rocket, 2.0f);
 		}
 	}
+
+    public void Die()
+    {
+        rb.velocity = Vector3.zero;
+    }
 
 	// Clamps angles when other angle limit is negative
 	public float strangeAxisClamp(float value, float limit1, float limit2)

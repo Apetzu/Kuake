@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 
@@ -10,38 +7,35 @@ public class playerHealth : NetworkBehaviour {
     [SerializeField]
     private RectTransform healthBar;
     [SerializeField]
-    private float maxHealth = 200;
-    [SerializeField]
-    private float spawnHealth = 100;
+    private float maxHealth = 100f;
 
     [SyncVar(hook = "UIChangeHealth")]
     public float CurrentHealth = 0.0f;
 
     float startWidth;
-    NetworkStartPosition[] spawnPoints;
     playerArmor armor;
 
     void Awake()
     {
-        CurrentHealth = spawnHealth;
+        CurrentHealth = maxHealth;
         startWidth = healthBar.sizeDelta.x;
         armor = GetComponent<playerArmor>();
-
-        if (isLocalPlayer)
-        {
-            spawnPoints = FindObjectsOfType<NetworkStartPosition>();
-        }
     }
 
-    void UIChangeHealth (float CurrentHealth)
+    void UIChangeHealth (float health)
     {
-        healthBar.sizeDelta = new Vector2(startWidth * (CurrentHealth / maxHealth), healthBar.rect.height);
+        CurrentHealth = health;
+        if (isLocalPlayer)
+            healthBar.sizeDelta = new Vector2(startWidth * (health / maxHealth), healthBar.rect.height);
     }
 
-	public void AddHealth (float AddedHealth)
+    [Server]
+    public void AddHealth (float AddedHealth)
 	{
-		// Add health to player, also checks added health to make sure we won't go over maxHP
-		if ((CurrentHealth + AddedHealth) < maxHealth) {
+        Debug.Log("Added health");
+
+        // Add health to player, also checks added health to make sure we won't go over maxHP
+        if ((CurrentHealth + AddedHealth) < maxHealth) {
 			CurrentHealth += AddedHealth;
 		} 
 		else if ((CurrentHealth + AddedHealth) >= maxHealth) {
@@ -50,55 +44,55 @@ public class playerHealth : NetworkBehaviour {
 					
 	}
 
+    [Server]
     public void TakeDamage(float Amount)
     {
-        if (!isServer)
+        if (armor.CurrentArmor > 0f)
         {
-            return;
-        }
-		// If 0 armor but hp 1+, just reduce hp
-		if (CurrentHealth > 0 && armor.currentArmor == 0) 
-		{
-			CurrentHealth -= Amount;
-		}
-		// If more armor than damage, reduce just armor
-		else if (CurrentHealth > 0 && armor.currentArmor >= Amount)
-		{
-			armor.currentArmor -= Amount;
-		}
-		// If less armor than damage, reduce armor and rest of the damage from hp
-		else if (CurrentHealth > 0 && armor.currentArmor < Amount)
-		{
-			float hpdmg = Amount - armor.currentArmor;
-			armor.currentArmor -= armor.currentArmor;
-			CurrentHealth -= hpdmg;
-		}
+            if (armor.CurrentArmor - Amount > 0)
+            {
+                armor.CurrentArmor -= Amount;
+            }
+            else
+            {
+                if (armor.CurrentArmor - Amount < 0)
+                {
+                    if (CurrentHealth - (Amount - armor.CurrentArmor) <= 0)
+                    {
+                        RpcRespawn();
+                    }
+                    else
+                    {
+                        CurrentHealth -= Amount - armor.CurrentArmor;
+                    }
+                }
 
-		// If hp equal or less than 0, player is dead and we respawn it
-		if (CurrentHealth <= 0)
+                armor.CurrentArmor = 0f;
+            }
+        }
+        else
         {
-            CurrentHealth = spawnHealth;
-
-            // called on the Server, but invoked on the Clients
-            RpcRespawn();
+            if (CurrentHealth - Amount > 0f)
+            {
+                CurrentHealth -= Amount;
+            }
+            else
+            {
+                RpcRespawn();
+            }
         }
-
     }
 
     [ClientRpc]
     void RpcRespawn()
     {
-        if (isLocalPlayer)
-        {
-            // move back to zero location
-            Vector3 spawnPoint = Vector3.zero;
+        //GetComponent<playerController>().Die();
+        Transform spawn = NetworkManager.singleton.GetStartPosition();
 
-            //if (spawnPoints != null && spawnPoints.Length > 0)
-           // {
-                spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
-            //}
+        CurrentHealth = maxHealth;
+        armor.ResetArmor();
 
-            transform.position = spawnPoint;
-        }
+        transform.position = spawn.position;
+        transform.rotation = spawn.rotation;
     }
 }

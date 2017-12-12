@@ -101,7 +101,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &114632219209884986
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -113,7 +113,7 @@ MonoBehaviour:
   m_Script: {fileID: -1768714887, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TransformSyncMode: 3
+  m_TransformSyncMode: 1
   m_SendInterval: 0
   m_SyncRotationAxis: 7
   m_RotationSyncCompression: 0
@@ -169,7 +169,7 @@ MonoBehaviour:
   speed: 100
   explosionPrefab: {fileID: 1766342354337212, guid: cb0b9280cce83b5448075f3573f45e54,
     type: 2}
-  spawner: {fileID: 0}
+  Spawner: {fileID: 0}
 --- !u!136 &136717543563753294
 CapsuleCollider:
   m_ObjectHideFlags: 1

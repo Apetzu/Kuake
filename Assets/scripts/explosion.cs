@@ -1,19 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class explosion : MonoBehaviour {
 
     [SerializeField]
     private ParticleSystem explosionParticle;
     [SerializeField]
-    private float radius = 5;
+    private float radius = 5f;
     [SerializeField]
-    private float explosionForce = 500;
+    private float explosionForce = 500f;
     [SerializeField]
-    private float damage = 10;
+    private float damage = 10f;
 
-    void Awake()
+    void Start()
     {
         explosionParticle = GetComponent<ParticleSystem>();
 
@@ -23,7 +21,7 @@ public class explosion : MonoBehaviour {
         {
             if (obj.attachedRigidbody != null)
             {
-				obj.attachedRigidbody.AddExplosionForce(explosionForce * Time.deltaTime, transform.position, radius, 1, ForceMode.Impulse);
+				obj.attachedRigidbody.AddExplosionForce(explosionForce, transform.position, radius, 1f, ForceMode.Impulse);
             }
 
             if (obj.tag == "Player")
@@ -32,8 +30,8 @@ public class explosion : MonoBehaviour {
             }
         }
 	}
-	
-	void Update () 
+
+    void Update () 
     {
         if (explosionParticle.isStopped)
         {
