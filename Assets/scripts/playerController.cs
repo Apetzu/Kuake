@@ -30,6 +30,12 @@ public class playerController : NetworkBehaviour {
     private GameObject hud;
     [SerializeField]
     private GameObject shades;
+	[SerializeField]
+	private GameObject pekker;
+	[SerializeField]
+	private GameObject leftTesticle;
+	[SerializeField]
+	private GameObject rightTesticle;
     [SerializeField]
     private GameObject fpw;
     [SerializeField]
@@ -128,6 +134,9 @@ public class playerController : NetworkBehaviour {
 		fpw.gameObject.SetActive(true);
 		hud.SetActive(true);
 		shades.SetActive(false);
+		pekker.SetActive (false);
+		leftTesticle.SetActive (false);
+		rightTesticle.SetActive (false);
 		playerModel.enabled = false;
 		rocketLauncher.SetActive(false);
 	}

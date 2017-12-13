@@ -57,7 +57,7 @@ MonoBehaviour:
   explosionParticle: {fileID: 0}
   radius: 5
   explosionForce: 10
-  damage: 50
+  damage: 35
 --- !u!114 &114849051312327306
 MonoBehaviour:
   m_ObjectHideFlags: 1

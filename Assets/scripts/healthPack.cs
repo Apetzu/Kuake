@@ -3,7 +3,7 @@ using UnityEngine.Networking;
 using UnityEngine;
 
 public class healthPack : NetworkBehaviour {
-	float packHealth = 10;
+	float packHealth = 25;
 
 	[SyncVar(hook = "OnVisibleChanged")]
 	bool visible;

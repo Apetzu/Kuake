@@ -3,7 +3,7 @@ using UnityEngine.Networking;
 using UnityEngine;
 
 public class megaArmorPack : NetworkBehaviour {
-	float packArmor = 25;
+	float packArmor = 75;
 
 	[SyncVar(hook = "OnVisibleChanged")]
 	bool visible;

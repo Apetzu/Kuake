@@ -3,7 +3,7 @@ using UnityEngine.Networking;
 using UnityEngine;
 
 public class armorPack : NetworkBehaviour {
-	float packArmor = 10;
+	float packArmor = 30;
 
 	[SyncVar(hook = "OnVisibleChanged")]
 	bool visible;
