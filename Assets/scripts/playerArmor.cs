@@ -20,6 +20,8 @@ public class playerArmor : NetworkBehaviour {
 	{
         CurrentArmor = startArmor;
         startWidth = armorBar.sizeDelta.x;
+
+        armorBar.sizeDelta = new Vector2(startWidth * (startArmor / maxArmor), armorBar.rect.height);
     }
 
 	void OnChangeArmor (float armor)

@@ -56,15 +56,6 @@ public class playerController : NetworkBehaviour {
 		playerCollider = GetComponent<CapsuleCollider>();
 	}
 
-    void Start()
-    {
-        if (!isLocalPlayer)
-        {
-            Destroy(this);
-        }
-            
-    }
-
     void FixedUpdate()
 	{
 		if (isLocalPlayer) // If this player is the local player

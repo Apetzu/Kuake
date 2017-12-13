@@ -5,9 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/scenes/AapoTest.unity
     guid: a358787dffc9f0844ace4b8bc0bfa6ee
-  - enabled: 0
+  - enabled: 1
     path: Assets/scenes/networkTest.unity
     guid: 564e5ef9df638054fa3f3123324905bf
